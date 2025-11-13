@@ -19,6 +19,7 @@ from src.tools import solve_vrp, calculate_route_economics
 from src.database import get_database_stats, get_db
 from src.config import get_settings
 from src.utils.logger import setup_logger
+from src.api.init_data import router as init_data_router
 import json
 
 # Initialize logger
@@ -44,6 +45,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(init_data_router, prefix="/api", tags=["Database Initialization"])
 
 # Application state
 app_state = {
