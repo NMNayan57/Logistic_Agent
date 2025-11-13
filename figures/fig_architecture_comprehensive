@@ -1,0 +1,129 @@
+// Logistics AI Agent System Architecture
+digraph {
+	bgcolor=white fontname=Arial fontsize=11 nodesep=0.5 rankdir=TB ranksep=0.8 splines=ortho
+	node [fontname=Arial fontsize=10 height=0.4 margin="0.15,0.1" shape=box style="rounded,filled"]
+	subgraph cluster_user {
+		color="#e1f5ff" fontname="Arial Bold" fontsize=12 label="User Layer" style=filled
+		web [label="Web Interface
+(React + Vite)" fillcolor="#90caf9"]
+		api_client [label="REST API Client
+(cURL/Postman)" fillcolor="#90caf9"]
+		nl_query [label="Natural Language
+Query" fillcolor="#64b5f6" shape=note]
+	}
+	subgraph cluster_gateway {
+		color="#d0f4de" fontname="Arial Bold" fontsize=12 label="API Gateway" style=filled
+		fastapi [label="FastAPI Server
+(Port 8000)" fillcolor="#81c784"]
+		validation [label="Request Validation
+& Routing" fillcolor="#66bb6a"]
+	}
+	subgraph cluster_orchestrator {
+		color="#ffe5ec" fontname="Arial Bold" fontsize=12 label="Orchestrator Layer (LLM Agent)" style=filled
+		langchain [label="LangChain
+AgentExecutor" fillcolor="#ef5350" fontcolor=white]
+		gpt4 [label="OpenAI GPT-4
+Turbo" fillcolor="#e53935" fontcolor=white shape=hexagon]
+		parser [label="Query Parser &
+Intent Recognition" fillcolor="#f48fb1"]
+		orchestrate [label="Tool Selection &
+Orchestration" fillcolor="#f48fb1"]
+		validate_constraint [label="Constraint
+Validator" fillcolor="#f48fb1"]
+		response_gen [label="Response
+Generator" fillcolor="#f48fb1"]
+	}
+	subgraph cluster_tools {
+		color="#fff3b0" fontname="Arial Bold" fontsize=12 label="Tool Suite (9 Specialized Functions)" style=filled
+		subgraph cluster_db_tools {
+			color="#ffa726" label="Database Tools" style=dashed
+			get_orders [label=get_orders fillcolor="#ffcc80"]
+			get_vehicles [label=get_vehicles fillcolor="#ffcc80"]
+			get_depot [label=get_depot fillcolor="#ffcc80"]
+		}
+		subgraph cluster_opt_tools {
+			color="#ffa726" label="Optimization Tools" style=dashed
+			solve_vrp [label="solve_vrp
+(OR-Tools)" fillcolor="#ffb74d"]
+			calc_distance [label="calculate_distance
+_matrix (OSRM)" fillcolor="#ffb74d"]
+		}
+		subgraph cluster_analytics {
+			color="#ffa726" label="Analytics Tools" style=dashed
+			calc_economics [label="calculate_route
+_economics" fillcolor="#ffa726"]
+			validate_tool [label="validate
+_constraints" fillcolor="#ffa726"]
+		}
+		subgraph cluster_scenario {
+			color="#ffa726" label="Scenario Tools" style=dashed
+			compare_scenarios [label="compare
+_scenarios" fillcolor="#ff9800"]
+			analyze_sens [label="analyze
+_sensitivity" fillcolor="#ff9800"]
+		}
+	}
+	subgraph cluster_data {
+		color="#e5e5e5" fontname="Arial Bold" fontsize=12 label="Data Layer" style=filled
+		sqlite [label="SQLite Database
+(Orders, Vehicles,
+Depots)" fillcolor="#bdbdbd" shape=cylinder]
+		osrm [label="OSRM Routing
+Engine" fillcolor="#9e9e9e" fontcolor=white shape=cylinder]
+		config [label="Configuration
+(.env)" fillcolor="#bdbdbd" shape=note]
+	}
+	subgraph cluster_external {
+		color="#f8edeb" fontname="Arial Bold" fontsize=12 label="External Services" style=filled
+		openai_api [label="OpenAI API
+(GPT-4 Model)" fillcolor="#d32f2f" fontcolor=white shape=doubleoctagon]
+		ortools [label="Google OR-Tools
+(CP-SAT Solver)" fillcolor="#c62828" fontcolor=white shape=doubleoctagon]
+	}
+	subgraph cluster_output {
+		color="#cfe2f3" fontname="Arial Bold" fontsize=12 label="Output Layer" style=filled
+		json_out [label="Routing Solutions
+(JSON)" fillcolor="#64b5f6"]
+		maps [label="Visual Maps
+(Leaflet.js)" fillcolor="#64b5f6"]
+		scenarios_out [label="Scenario
+Comparisons" fillcolor="#64b5f6"]
+		warnings [label="Constraint
+Warnings" fillcolor="#ff9800" fontcolor=white]
+	}
+	web -> fastapi [color="#1976d2"]
+	api_client -> fastapi [color="#1976d2"]
+	nl_query -> fastapi [color="#1976d2" style=dashed]
+	fastapi -> validation [color="#388e3c"]
+	validation -> langchain [color="#388e3c"]
+	langchain -> gpt4 [color="#c62828" dir=both]
+	gpt4 -> parser [color="#c62828"]
+	parser -> orchestrate [color="#c62828"]
+	orchestrate -> validate_constraint [color="#c62828"]
+	validate_constraint -> response_gen [color="#c62828"]
+	gpt4 -> openai_api [color="#d32f2f" dir=both style=dashed]
+	orchestrate -> get_orders [color="#f57c00"]
+	orchestrate -> get_vehicles [color="#f57c00"]
+	orchestrate -> get_depot [color="#f57c00"]
+	orchestrate -> solve_vrp [color="#f57c00"]
+	orchestrate -> calc_distance [color="#f57c00"]
+	orchestrate -> calc_economics [color="#f57c00"]
+	orchestrate -> validate_tool [color="#f57c00"]
+	orchestrate -> compare_scenarios [color="#f57c00"]
+	orchestrate -> analyze_sens [color="#f57c00"]
+	get_orders -> sqlite [color="#757575"]
+	get_vehicles -> sqlite [color="#757575"]
+	get_depot -> sqlite [color="#757575"]
+	calc_distance -> osrm [color="#757575"]
+	calc_economics -> config [color="#757575" style=dashed]
+	validate_tool -> config [color="#757575" style=dashed]
+	solve_vrp -> ortools [color="#c62828" style=dashed]
+	response_gen -> json_out [color="#1976d2"]
+	json_out -> maps [color="#1976d2" style=dashed]
+	json_out -> scenarios_out [color="#1976d2" style=dashed]
+	validate_constraint -> warnings [color="#ff6f00"]
+	json_out -> web [color="#1976d2"]
+	maps -> web [color="#1976d2" style=dashed]
+	scenarios_out -> web [color="#1976d2" style=dashed]
+	warnings -> web [color="#ff6f00"]
+}
