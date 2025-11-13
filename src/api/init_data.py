@@ -93,7 +93,7 @@ def create_sample_vehicles(num_vehicles: int = 5) -> list[Vehicle]:
     return vehicles
 
 
-@router.post("/init-sample-data")
+@router.get("/init-sample-data")
 async def initialize_sample_data(
     num_orders: int = 20,
     num_vehicles: int = 5,
